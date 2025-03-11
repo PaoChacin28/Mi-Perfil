@@ -8,30 +8,47 @@ const PORT = 3000;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-
-// Servir archivos estáticos desde "public"
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Servir perfil.html en la ruta raíz "/"
+// Ruta principal que sirve `perfil.html`
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "perfil.html"));
 });
 
-// Ruta para procesar el formulario
-app.post("/contacto", (req, res) => {
+// Ruta para mostrar los datos recibidos
+app.get("/resultado", (req, res) => {
+    const { nombre, email, mensaje } = req.query;
+
+    res.send(`
+        <html>
+        <head>
+            <title>Datos Enviados</title>
+            <link rel="stylesheet" href="/css/estilos.css">
+        </head>
+        <body>
+            
+            <!-- Estructura de la tarjeta -->
+            <div class="card">
+                <h2>Datos Recibidos</h2>
+                <div class="container">
+                    <h4><b>Nombre:</b> ${nombre}</h4>
+                    <p><b>Email:</b> ${email}</p>
+                    <p><b>Mensaje:</b> ${mensaje}</p>
+                </div>
+            </div>
+            <a href="/">Volver a Mi Perfil</a>
+        </body>
+        </html>
+    `);
+});
+
+// Ruta para procesar el formulario y redirigir a /resultado
+app.post("/api/contacto", (req, res) => {
     const { nombre, email, mensaje } = req.body;
 
-    if (!nombre || !email || !mensaje) {
-        return res.status(400).json({ message: "Todos los campos son obligatorios." });
-    }
-
-    console.log("📩 Nuevo mensaje recibido:");
-    console.log("Nombre:", nombre);
-    console.log("Correo:", email);
-    console.log("Mensaje:", mensaje);
-
-    res.json({ message: "¡Mensaje enviado con éxito!" });
+    // Redirigir a /resultado con los datos como parámetros en la URL
+    res.redirect(`/resultado?nombre=${encodeURIComponent(nombre)}&email=${encodeURIComponent(email)}&mensaje=${encodeURIComponent(mensaje)}`);
 });
 
 // Iniciar servidor
