@@ -1,0 +1,28 @@
+name: CI Workflow for Windows
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest  # Sistema operativo Windows
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # Realiza el checkout del código fuente
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Define la versión de Node.js que necesitas
+
+      - name: Install dependencies
+        run: npm install  # Instala las dependencias de tu proyecto
+
+      - name: Run tests
+        run: npm test  # Ejecuta los tests del proyecto
